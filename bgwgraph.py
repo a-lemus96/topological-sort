@@ -1,24 +1,26 @@
 # standard library modules
-from typing import Any, List
+from typing import Any, List, Tuple
+from typing_extensions import Self
 
+#Self = TypeVar("Self", bound="BGWNode")
 
 class BGWNode:
     """Black-Gray-White colored node."""
 
-    def __init__(self, key: str) -> None:
+    def __init__(self, key: Any) -> Self:
         """Constructor method for BGWNode class. It initializes node to have
         WHITE as initial color value.
         ------------------------------------------------------------------------
         Args:
-            key: str id for the node"""
+            key: any hashable id for the node"""
         # private instance attributes
         self.__color = 'white'
         self.__parent = None
 
         # public instance attributes
         self.key = key
-        self.td = None # discovery timestamp
-        self.tf = None # final timestamp
+        self.td = 0 # discovery timestamp
+        self.tf = 0 # final timestamp
 
 
     # Public Methods
@@ -47,12 +49,12 @@ class BGWNode:
         return True
 
 
-    def get_parent(self): -> BWGNode:
+    def get_parent(self) -> Self:
         """Retrieve node's parent.
         ---------------------------------------------------------------------"""
         return self.__parent
 
-    def set_parent(self, new_parent: BGWNode) -> bool:
+    def set_parent(self, new_parent: Self) -> bool:
         """Update node's parent. The method verifies that the new_parent
         attribute is a BGWNode instance.
         ------------------------------------------------------------------------
@@ -64,9 +66,9 @@ class BGWNode:
         if isinstance(new_parent, BGWNode):
            self.__parent = new_parent 
 
-       else:
-           err_msg = "ValueError: new_parent is not a BGWNode instance"
-           raise Exception(err_msg)
+        else:
+            err_msg = "ValueError: new_parent is not a BGWNode instance"
+            raise Exception(err_msg)
 
         return True
 
@@ -79,8 +81,8 @@ class DiGraph:
     def __init__(
             self, 
             nodes: List[Any] = [], 
-            edges: List[Tuple(Any)] = []
-            ) -> DiGraph:
+            edges: List[Tuple[Any]] = []
+            ) -> Self:
         """Class constructor. asdfasdfasdf description goes here
         ------------------------------------------------------------------------
         """
@@ -96,11 +98,11 @@ class DiGraph:
                 
                 raise Exception(err_msg)
                 
-            self.__adj_dict.set_default(node.key, [])
+            self.__adj_dict.setdefault(node.key, {'node': node, 'adj': []})
             self.__n_nodes += 1 # increase number of nodes
 
         for edge in edges: # organize edges as an adjacency matrix
-            if len(edge) is not 2:
+            if len(edge) != 2:
                 err_msg = f"ValueError: {edge} edge must be a 2-tuple"
 
                 raise Exception(err_msg)
@@ -112,8 +114,8 @@ class DiGraph:
 
             # if edge meets previous criteria, add to adjacency list
             parent, child = edge
-            if child not in self.__adj_dict[parent.key]:
-                (self.__adj_dict[parent.key]).append(child) 
+            if child not in self.__adj_dict[parent]:
+                (self.__adj_dict[parent]['adj']).append(child) 
                 self.__n_edges += 1 # increase number of edges 
 
 
@@ -136,14 +138,25 @@ class DiGraph:
 
     # Public Methods
 
-    def get_adj(self, node: self__type) -> List:
+    def get_nodes(self) -> List:
+        """Retrieve the set of nodes for a particular graph.
+        ------------------------------------------------------------------------
+        """
+        # iterate through all nodes
+        nodes = []
+        for value in self.__adj_dict.values():
+           nodes.append(value['node'])
+
+        return nodes
+
+    def get_adj(self, node) -> List:
         """Retrieve an arbitrary node's adjacency list.
         ------------------------------------------------------------------------
         """
-        adj_list = self.__adj_dict[node.key]
+        adj_list = self.__adj_dict[node.key]['adj']
         return adj_list
 
-    def set_adj(self, node: self.__type, lst: List[Any]) -> bool:
+    def set_adj(self, node, lst: List[Any]) -> bool:
         """Method for setting node's adjacency list attribute to lst arg.
         ------------------------------------------------------------------------
         Args:
@@ -152,9 +165,15 @@ class DiGraph:
             bool: True if succesful, otherwise raises an exception"""
         # check if lst is a valid list for self.__type class operations
         if __valid_adj(lst):
-            self.__adj_dict[node.key] = lst
+            self.__adj_dict[node.key]['adj'] = lst
         else:
             err_msg = "ValueError: invalid lst value or format"
             raise Exception(err_msg)
+
+    def size_nodes(self) -> int:
+        return self.__n_nodes
+
+    def size_edges(self) -> int:
+        return self.__n_edges
 
         return True
