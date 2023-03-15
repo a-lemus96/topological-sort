@@ -2,7 +2,8 @@
 from typing import Any, List
 
 # third-party modules
-import networkx as nx # just for plotting
+import matplotlib.pyplot as plt
+import networkx as nx # we use it just for plotting with networkx.drawing module
 
 # custom modules
 import dfs
@@ -17,13 +18,20 @@ edges = [('belt', 'jacket'), ('pants', 'belt'), ('pants', 'shoes'),
          ('tie', 'jacket'), ('undershorts', 'pants'), ('undershorts', 'shoes')]
 
 G = bgwg.DiGraph(keys, edges)
-print(G.size_nodes(), G.size_edges())
-for node in G.get_nodes():
-    print(f"Node: {node.key}, Adj: {G.get_adj(node)}")
+print(f"Acyclic graph with {G.size_nodes()} nodes and {G.size_edges()} edges\n")
+for node in G.nodes:
+    print(f"Node: {node},\t\tAdjacent Nodes: {G.adj[node]}")
 
 # call DFS to compute finishing times for each vertex
 sorting = dfs.dfs(G)
+print(f"\nTopologial sorting with '{keys[0]}' as source: {sorting}")
 
-[print(node.key) for node in sorting]
+"""# create nx.DiGraph object just for plotting purposes
+G_nx = nx.DiGraph()
+G_nx.add_nodes_from(keys)
+G_nx.add_edges_from(edges)
 
-# plot topological ordered graph
+fig, ax = plt.subplots(layout='constrained')
+ax = nx.draw(G_nx, with_labels=True, font_weight='bold')
+plt.savefig('out/digraph.png')
+plt.close()"""

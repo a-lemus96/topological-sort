@@ -2,7 +2,6 @@
 from typing import Any, List, Tuple
 from typing_extensions import Self
 
-#Self = TypeVar("Self", bound="BGWNode")
 
 class BGWNode:
     """Black-Gray-White colored node."""
@@ -39,7 +38,7 @@ class BGWNode:
                        previous requirements
         Returns:
             bool: True if succesful, otherwise raises an exception"""
-        if new_color in ['white', 'gray', 'blac']:
+        if new_color in ['white', 'gray', 'black']:
             self.__color = new_color
 
         else:
@@ -102,7 +101,7 @@ class DiGraph:
             self.adj[node] = [] # initialize adjacency list
             self.__n_nodes += 1 # increase number of nodes
 
-        for edge in edges: # organize edges as an adjacency matrix
+        for edge in edges: # organize edges as an adjacency list
             if len(edge) != 2:
                 err_msg = f"ValueError: {edge} edge must be a 2-tuple"
 
@@ -115,8 +114,8 @@ class DiGraph:
 
             # if edge meets previous criteria, add to adjacency list
             parent, child = edge
-            if child not in self.__adj[parent]:
-                (self.__adj[parent]).append(child) 
+            if child not in self.adj[parent]:
+                (self.adj[parent]).append(child) 
                 self.__n_edges += 1 # increase number of edges 
 
 
