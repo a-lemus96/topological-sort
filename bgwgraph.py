@@ -76,7 +76,8 @@ class BGWNode:
 
 class DiGraph:
     """Directed graph class definition. It may handle any arbitrary built-in or
-    custom object."""
+    custom object. It is intented to be used for algorithms that require the
+    BGWNode datatype."""
 
     def __init__(
             self, 
@@ -87,18 +88,18 @@ class DiGraph:
         ------------------------------------------------------------------------
         """
         # private instance attributes
-        self.__adj_dict = {}
-        self.__type = type(nodes[0])
+        self.__type = BGWNode
         self.__n_edges = 0
         self.__n_nodes = 0
 
-        for node in nodes: # initialize keys and values
-            if type(node) is not self.__type:
-                err_msg = f"TypeError: {node} node must be type {self.__type}"
-                
-                raise Exception(err_msg)
-                
-            self.__adj_dict.setdefault(node.key, {'node': node, 'adj': []})
+        # public instance attributes
+        self.nodes = {} # dictionary for BWGNode objects
+        self.adj = {}
+
+        for node in nodes: # initialize keys and values 
+            bgw_node = BGWNode(node) 
+            self.nodes[node] = bgw_node
+            self.adj[node] = [] # initialize adjacency list
             self.__n_nodes += 1 # increase number of nodes
 
         for edge in edges: # organize edges as an adjacency matrix
@@ -114,8 +115,8 @@ class DiGraph:
 
             # if edge meets previous criteria, add to adjacency list
             parent, child = edge
-            if child not in self.__adj_dict[parent]:
-                (self.__adj_dict[parent]['adj']).append(child) 
+            if child not in self.__adj[parent]:
+                (self.__adj[parent]).append(child) 
                 self.__n_edges += 1 # increase number of edges 
 
 
@@ -131,44 +132,12 @@ class DiGraph:
             bool: True if lst meets self.__type criteria, False otherwise"""
         is_list = isinstance(lst, list)
         is_empty = len(lst) == 0
-        type_check = all(isinstance(n, self.type) for n in lst) # check types
+        type_check = all(isinstance(n, self.__type) for n in lst) # check types
 
         return is_list and (is_empty or type_check)
 
 
-    # Public Methods
-
-    def get_nodes(self) -> List:
-        """Retrieve the set of nodes for a particular graph.
-        ------------------------------------------------------------------------
-        """
-        # iterate through all nodes
-        nodes = []
-        for value in self.__adj_dict.values():
-           nodes.append(value['node'])
-
-        return nodes
-
-    def get_adj(self, node) -> List:
-        """Retrieve an arbitrary node's adjacency list.
-        ------------------------------------------------------------------------
-        """
-        adj_list = self.__adj_dict[node.key]['adj']
-        return adj_list
-
-    def set_adj(self, node, lst: List[Any]) -> bool:
-        """Method for setting node's adjacency list attribute to lst arg.
-        ------------------------------------------------------------------------
-        Args:
-            lst: Python list object
-        Returns:
-            bool: True if succesful, otherwise raises an exception"""
-        # check if lst is a valid list for self.__type class operations
-        if __valid_adj(lst):
-            self.__adj_dict[node.key]['adj'] = lst
-        else:
-            err_msg = "ValueError: invalid lst value or format"
-            raise Exception(err_msg)
+    # Public Method
 
     def size_nodes(self) -> int:
         return self.__n_nodes
